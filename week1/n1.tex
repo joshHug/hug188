@@ -27,17 +27,17 @@
 
 \section*{Agents}
 
-In artificial intelligence, the central problem at hand is that of the creation of a rational \textbf{agent}, an entity that has goals or preferences and trys to perform a series of \textbf{actions} that yields the best/optimal expected outcome given these goals. Rational agents exist in a \textbf{world}, which is specific to the given instantiation of the agent. As a very simple example, the world for a checkers agent is the virtual checkers board on which it plays against opponents, where piece moves are actions. 
+In artificial intelligence, the central problem at hand is that of the creation of a rational \textbf{agent}, an entity that has goals or preferences and tries to perform a series of \textbf{actions} that yields the best/optimal expected outcome given these goals. Rational agents exist in a \textbf{world}, which is specific to the given instantiation of the agent. As a very simple example, the world for a checkers agent is the virtual checkers board on which it plays against opponents, where piece moves are actions. 
 
-A \textbf{reflex agent} is one that doesn't think about the consequences of its actions, but rather simply looks at the current state of the world and decides which action is best. These agents are typically outperformed by \textbf{planning agents}, which maintain a model of the world, and use this model to simulate performing various actions, using these simulations to determine hypothesized consequences of these actions and only then selecting the best one. This is simulated "intelligence" in the sense that it's exactly what humans do when trying to determine the best possible move in any situation. Planning agents possess the capacity to "think ahead".
+A \textbf{reflex agent} is one that doesn't think about the consequences of its actions, but rather simply looks at the current state of the world and decides which action is best. These agents are typically outperformed by \textbf{planning agents}, which maintain a model of the world, and use this model to simulate performing various actions, using these simulations to determine hypothesized consequences of these actions and only then selecting the best one. This is simulated "intelligence" in the sense that it's exactly what humans do when trying to determine the best possible move in any situation - thinking ahead.
 
 \section*{State Spaces and Search Problems}
-In order to create a rational planning agent, we need a way to express the given world in which the agent will exist mathematically. To do this we must formally express a \textbf{search problem} - given our agent's current state, how can we arrive at a new state that satisfies its goals in the best possible way? Formulating such a problem requires four things:
+In order to create a rational planning agent, we need a way to mathematically express the given world in which the agent will exist. To do this we must formally express a \textbf{search problem} - given our agent's current state, how can we arrive at a new state that satisfies its goals in the best possible way? Formulating such a problem requires four things:
 	\begin{itemize}
 		\item A \textbf{state space} - The set of all possible \textbf{states} that are possible in your given world
 		\item A \textbf{successor function} - A function that takes in a state and an action and computes the cost of performing that action as well as the \textbf{successor state}, the state the world would be in if the given agent performed that action
 		\item A \textbf{start state} - The state in which an agent exists initially
-		\item A \textbf{goal test} - a function that takes a state as input, and determines whether it is a goal state
+		\item A \textbf{goal test} - A function that takes a state as input, and determines whether it is a goal state
 	\end{itemize}
 Fundamentally, a search problem is solved by first considering the start state, then exploring the state space using the successor function, iteratively expanding various states until we arrive at a goal state, at which point we will have determined a path from the start state to the goal state (typically called a \textbf{plan}). The order in which states are expanded is determined using a predetermined \textbf{strategy}. We'll cover types of strategies and their usefulness shortly.
 
@@ -53,14 +53,14 @@ Let's consider a variation of the game in which the maze contains only Pacman an
 \item{\textbf{Pathing}}
 	\begin{itemize}
 		\item States: (x,y) locations
-		\item Actions: NSEW
+		\item Actions: North, South, East, West
 		\item Successor: Update location only
 		\item Goal test: Is (x,y)=END?
 	\end{itemize}
 \item{\textbf{Eat-all-dots}}
 	\begin{itemize}
 		\item States: {(x,y) location, dot booleans}
-		\item Actions: NSEW
+		\item Actions: North, South, East, West
 		\item Successor: Update location and booleans
 		\item Goal test: Are all dot booleans false?
 	\end{itemize}
@@ -130,7 +130,7 @@ When we have no knowledge of the location of goal states in our search tree, we 
 	\includegraphics[width=7cm, height=4cm]{img/bfs}
 \end{center}
 \item \textit{Completeness} - If a solution exists, then the depth of the shallowest node $s$ must be finite, so BFS must eventually search this depth. Hence, it's complete.
-\item \textit{Optimality} - BFS is generally not optimal because it simply does not take costs into consideration when determining which node to replace on the fringe. The special case where BFS is guaranteed to be optimal is if all edge costs are equivalent, because this reduces BFS to a special case of uniform cost search, which is presented below.
+\item \textit{Optimality} - BFS is generally not optimal because it simply does not take costs into consideration when determining which node to replace on the fringe. The special case where BFS is guaranteed to be optimal is if all edge costs are equivalent, because this reduces BFS to a special case of uniform cost search, which is discussed below.
 \item \textit{Time Complexity} - We must search $1 + b + b^2 + ... + b^s$ nodes in the worst case, since we go through all nodes at every depth from 1 to $s$. Hence, the time complexity is $O(b^s)$.
 \item \textit{Space Complexity} - The fringe, in the worst case, contains all the nodes in the level corresponding to the shallowest solution. Since the shallowest solution is located at depth $s$, there are $O(b^s)$ nodes at this depth.
 \end{itemize}
@@ -148,7 +148,7 @@ When we have no knowledge of the location of goal states in our search tree, we 
 \item \textit{Space Complexity} - Roughly, the fringe will contain all nodes at the level of the cheapest solution, so the space complexity of UCS is estimated as $O(b^{C^*/\epsilon})$.
 \end{itemize}
 
-As a parting note about uninformed search, it's critical to note that the three strategies outlined above are fundamentally the same - all three are very slight variations of one another with their similarities being captured by the tree search pseudocode presented above.
+As a parting note about uninformed search, it's critical to note that the three strategies outlined above are fundamentally the same - differing only in expansion strategy, with their similarities being captured by the tree search pseudocode presented above.
 
 \section*{Informed Search}
 Uniform cost search is good because it's both complete and optimal, but it can be fairly slow because it expands in every direction from the start state while searching for a goal. If we have some notion of the direction in which we should focus our search, we can significantly improve performance and "hone in" on a goal much more quickly. This is exactly the focus of \textbf{informed search}.
@@ -211,7 +211,7 @@ Before attacking the question of what constitutes a "good" heuristic, we must fi
 
 Hence, such a heuristic reduces A* search to BFS, where all edge costs are equivalent. As we've already shown, BFS is not guaranteed to be optimal. \newline
 
-The condition required for optimality when using A* tree search is known as \textbf{admissibility}. The admissibility constraint states that the value estimated by an admissible heuristic is both positive and not an overestimate. Defining $h^*(n)$ as the true optimal cost to reach a goal state from a given node $n$, we can formulate the admissibility constraint mathematically as follows: 
+The condition required for optimality when using A* tree search is known as \textbf{admissibility}. The admissibility constraint states that the value estimated by an admissible heuristic is neither negative nor an overestimate. Defining $h^*(n)$ as the true optimal cost to reach a goal state from a given node $n$, we can formulate the admissibility constraint mathematically as follows: 
 
 $$\forall{n}, 0 \leq h(n) \leq h^*(n)$$
 
@@ -224,11 +224,11 @@ A simple consequence of combining the two above inequalities is the following:
  $$f(n) \leq f(A) \wedge f(A) < f(B) \Longrightarrow f(n) < f(B)$$
  Hence, we can conclude that $n$ is expanded before $B$. Because we have proven this for arbitrary $n$, we can conclude that \textit{all} ancestors of $A$ (including $A$ itself) expand before $B$. $\Box$\newline
 
-One problem we found above with tree search was that in some cases it could fail to ever find a solution, getting stuck searching the same cycle in the state space graph infinitely. Even in situations where our search technique doesn't involve such an infinite loop, it's often the case that we revisit the same node multiple times because there's multiple ways to get to that same node. This leads to exponentially more work, and the natural solution is to simply keep track of which states you've already visited, and never visit them again. More explicitly, maintain a "closed" set of visited nodes while utilizing your search method of choice. Then, ensure that each node that's expanded isn't already in the set before expansion and add it to the set after expansion if it's not. Tree search with this added optimization is known as \textbf{graph search}, and the pseudocode for it is presented below:
+One problem we found above with tree search was that in some cases it could fail to ever find a solution, getting stuck searching the same cycle in the state space graph infinitely. Even in situations where our search technique doesn't involve such an infinite loop, it's often the case that we revisit the same node multiple times because there's multiple ways to get to that same node. This leads to exponentially more work, and the natural solution is to simply keep track of which states you've already visited, and never visit them again. More explicitly, maintain a "closed" set of visited nodes while utilizing your search method of choice. Then, ensure that each node isn't already in the set before expansion and add it to the set after expansion if it's not. Tree search with this added optimization is known as \textbf{graph search}, and the pseudocode for it is presented below:
 \begin{center}
 	\includegraphics[height=6cm,width=15cm]{img/graph_search_pseudocode}
 \end{center}
-Note that in implementation, it's critically important to store the closed set as a disjoint set and not a list. Storing it as a list requires costs $O(n)$ operations to check for membership, which tends to ruin the performance improvement graph search is intended to provide. An additional caveat of graph search is that it tends to ruin the completeness and optimality of A*, even under admissible heuristics. Consider the following simple state space graph and corresponding search tree, annotated with weights and heuristic values:
+Note that in implementation, it's critically important to store the closed set as a disjoint set and not a list. Storing it as a list requires costs $O(n)$ operations to check for membership, which eliminates the performance improvement graph search is intended to provide. An additional caveat of graph search is that it tends to ruin the completeness and optimality of A*, even under admissible heuristics. Consider the following simple state space graph and corresponding search tree, annotated with weights and heuristic values:
 \begin{center}
 	\includegraphics[height=7cm]{img/bad_graph_search}
 \end{center}
@@ -253,6 +253,6 @@ Dominance very intuitively captures the idea of one heuristic being better than 
 \begin{center}
 	\includegraphics[height=6cm]{img/semi-lattice}
 \end{center}
-As a general rule, the $max$ function applied to two admissible heuristics will also always be admissible. This is simply a consequence of both values output by the two heuristics for any given state both being constrained by the admissibility condition, $0 \leq h(n) \leq h^*(n)$. The maximum of two numbers in this range must also fall in the same range.
+As a general rule, the $\max$ function applied to two admissible heuristics will also always be admissible. This is simply a consequence of both values output by the two heuristics for any given state both being constrained by the admissibility condition, $0 \leq h(n) \leq h^*(n)$. The maximum of two numbers in this range must also fall in the same range.
 
 \end{document}
