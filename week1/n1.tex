@@ -29,7 +29,7 @@
 
 In artificial intelligence, the central problem at hand is that of the creation of a rational \textbf{agent}, an entity that has goals or preferences and tries to perform a series of \textbf{actions} that yields the best/optimal expected outcome given these goals. Rational agents exist in a \textbf{world}, which is specific to the given instantiation of the agent. As a very simple example, the world for a checkers agent is the virtual checkers board on which it plays against opponents, where piece moves are actions. 
 
-A \textbf{reflex agent} is one that doesn't think about the consequences of its actions, but rather simply looks at the current state of the world and decides which action is best. These agents are typically outperformed by \textbf{planning agents}, which maintain a model of the world, and use this model to simulate performing various actions, using these simulations to determine hypothesized consequences of these actions and only then selecting the best one. This is simulated "intelligence" in the sense that it's exactly what humans do when trying to determine the best possible move in any situation - thinking ahead.
+A \textbf{reflex agent} is one that doesn't think about the consequences of its actions, but rather selects an action based solely on the current state of the world. These agents are typically outperformed by \textbf{planning agents}, which maintain a model of the world, and use this model to simulate performing various actions, using these simulations to determine hypothesized consequences of these actions and only then selecting the best one. This is simulated "intelligence" in the sense that it's exactly what humans do when trying to determine the best possible move in any situation - thinking ahead.
 
 \section*{State Spaces and Search Problems}
 In order to create a rational planning agent, we need a way to mathematically express the given world in which the agent will exist. To do this we must formally express a \textbf{search problem} - given our agent's current state, how can we arrive at a new state that satisfies its goals in the best possible way? Formulating such a problem requires four things:
@@ -39,7 +39,7 @@ In order to create a rational planning agent, we need a way to mathematically ex
 		\item A \textbf{start state} - The state in which an agent exists initially
 		\item A \textbf{goal test} - A function that takes a state as input, and determines whether it is a goal state
 	\end{itemize}
-Fundamentally, a search problem is solved by first considering the start state, then exploring the state space using the successor function, iteratively expanding various states until we arrive at a goal state, at which point we will have determined a path from the start state to the goal state (typically called a \textbf{plan}). The order in which states are expanded is determined using a predetermined \textbf{strategy}. We'll cover types of strategies and their usefulness shortly.
+Fundamentally, a search problem is solved by first considering the start state, then exploring the state space using the successor function, iteratively computing successors of various states until we arrive at a goal state, at which point we will have determined a path from the start state to the goal state (typically called a \textbf{plan}). The order in which states are considered is determined using a predetermined \textbf{strategy}. We'll cover types of strategies and their usefulness shortly.
 
 Before we continue with how to solve search problems, it's important to note the difference between a \textbf{world state}, and a \textbf{search state}. A world state contains all information about a given state, whereas a search state contains only the information about the world that's necessary for planning (primarily for space effiency reasons). To illustrate these concepts, we'll introduce the hallmark motivating example of this course - Pacman. The game of Pacman is simple: Pacman must navigate a maze and eat all the (small) food pellets in the maze without being eaten by the malicious patrolling ghosts. If Pacman eats one of the (large) power pellets, he becomes ghost-immune for a set period of time and gains the ability to eat ghosts for points. 
 
@@ -47,7 +47,7 @@ Before we continue with how to solve search problems, it's important to note the
 	\includegraphics[width=16.5cm]{img/pacman_example}
 \end{center}
 
-Let's consider a variation of the game in which the maze contains only Pacman and food pellets. We can pose two distinct search problems: pathing and eat-all-dots. Pathing attempts to solve the problem of getting from position $(x_1, y_1)$ to position $(x_2, y_2)$ in the maze optimally, while eat all dots attempts to solve the problem of consuming all food pellets in the maze in the shortest time possible. Below, the states, actions, successor function, and goal test for both problems are listed:
+Let's consider a variation of the game in which the maze contains only Pacman and food pellets. We can pose two distinct search problems in this scenario: pathing and eat-all-dots. Pathing attempts to solve the problem of getting from position $(x_1, y_1)$ to position $(x_2, y_2)$ in the maze optimally, while eat all dots attempts to solve the problem of consuming all food pellets in the maze in the shortest time possible. Below, the states, actions, successor function, and goal test for both problems are listed:
 \begin{multicols}{2}
 \begin{itemize}
 \item{\textbf{Pathing}}
@@ -67,7 +67,7 @@ Let's consider a variation of the game in which the maze contains only Pacman an
 \end{itemize}
 \end{multicols}
 
-Note that for pathing, states contain less information than states for eat-all-dots, because for eat-all-dots we must maintain an array of booleans, corresponding to each food pellet and whether or not it's been eaten in the given state. A world state may contain more information still, potentially encoding information about  things like total distance traveled by Pacman or positions visited by Pacman on top of (x,y) location and dot booleans.
+Note that for pathing, states contain less information than states for eat-all-dots, because for eat-all-dots we must maintain an array of booleans corresponding to each food pellet and whether or not it's been eaten in the given state. A world state may contain more information still, potentially encoding information about  things like total distance traveled by Pacman or all positions visited by Pacman on top of its current (x,y) location and dot booleans.
 
 \subsection*{State Space Size} 
 An important question that often comes up while estimating the computational runtime of solving a search problem is the size of the state space. This is done almost exclusively with the \textbf{fundamental counting principle}, which states that if there are $n$ variable objects in a given world which can take on $x_1$, $x_2$, ..., $x_n$ different values respectively, then the total number of states is $x_1 \cdot x_2 \cdot ... \cdot x_n$. Let's use Pacman to show this concept by example:
@@ -88,14 +88,14 @@ Now that we've established the idea of a state space and the four components nec
 
 Recall that a graph is defined by a set of nodes and a set of edges connecting various pairs of nodes. These edges may also have weights associated with them. A \textbf{state space graph} is constructed with states representing nodes, with directed edges existing from a state to its successors. These edges represent actions, and any associated weights represent the cost of performing the corresponding action. Typically, state space graphs are much too large to store in memory (even our simple Pacman example from above has $\approx 10^{13}$ possible states, yikes!), but they're good to keep in mind conceptually while solving problems. It's also important to note that in a state space graph, each state is represented exactly once - there's simply no need to represent a state multiple times, and knowing this helps quite a bit when trying to reason about search problems.
 
-Unlike state space graphs, our next structure of interest, \textbf{search trees}, have no such restriction on the number of times a state can appear. This is because though search trees are also a class of graph with states as nodes and actions as edges between states, each state/node encodes not just the state itself, but the path (or \textbf{plan}) from the start state to the given state in the state space graph. Observe the state space graph and corresponding search tree below:
+Unlike state space graphs, our next structure of interest, \textbf{search trees}, have no such restriction on the number of times a state can appear. This is because though search trees are also a class of graph with states as nodes and actions as edges between states, each state/node encodes not just the state itself, but the entire path (or \textbf{plan}) from the start state to the given state in the state space graph. Observe the state space graph and corresponding search tree below:
 	\begin{center}
 		\includegraphics[width=15cm,height=6cm]{img/graph_and_tree}
 	\end{center}
-The highlighted path (S $\rightarrow$ d $\rightarrow$ e $\rightarrow$ r $\rightarrow$ f $\rightarrow$ G) in the given state space graph is represented in the corresponding search tree by following the path in the tree from the start state $S$ to the highlighted goal state $G$. Similarly, each and every path from the start node to any other node is represented in the search tree by a path from the root $S$ to a leaf node corresponding to the other node. Since there often exist multiple ways to get from one state to another, states tend to show up multiple times in search trees. As a result, search trees are greater than or equal to their corresponding state space graph in size. We've already determined that state space graphs themselves can be enormous in size even for simple problems, and so the question arises - how can we perform useful computation on these structures if they're too big to represent in memory? The answer lies in successor functions - we only store states we're immediately working with, and compute new ones on-demand using the corresponding successor function. Typically, search problems are solved using search trees, where we very carefully store a select few nodes to observe at a time, iteratively replacing nodes with their successors until we arrive at a goal state. There exist various methods by which to decide the order in which to conduct this iterative replacement of search tree nodes, and we'll present these methods now.
+The highlighted path (S $\rightarrow$ d $\rightarrow$ e $\rightarrow$ r $\rightarrow$ f $\rightarrow$ G) in the given state space graph is represented in the corresponding search tree by following the path in the tree from the start state $S$ to the highlighted goal state $G$. Similarly, each and every path from the start node to any other node is represented in the search tree by a path from the root $S$ to some descendant of the root corresponding to the other node. Since there often exist multiple ways to get from one state to another, states tend to show up multiple times in search trees. As a result, search trees are greater than or equal to their corresponding state space graph in size. We've already determined that state space graphs themselves can be enormous in size even for simple problems, and so the question arises - how can we perform useful computation on these structures if they're too big to represent in memory? The answer lies in successor functions - we only store states we're immediately working with, and compute new ones on-demand using the corresponding successor function. Typically, search problems are solved using search trees, where we very carefully store a select few nodes to observe at a time, iteratively replacing nodes with their successors until we arrive at a goal state. There exist various methods by which to decide the order in which to conduct this iterative replacement of search tree nodes, and we'll present these methods now.
 
 \section*{Uninformed Search}
-The standard protocol for finding a plan to get from the start state to a goal state is to maintain an outer \textbf{fringe} of partial plans derived from the search tree. We continually \textbf{expand} our fringe by removing a node (which is selected using our given \textbf{strategy}) corresponding to a partial plan from the fringe, and replacing it on the fringe with all its children. Removing and replacing an element on the fringe with its children corresponds to discarding a single length $n$ plan and bringing all length $(n+1)$ plans that stem from it into consideration. We continue this until eventually removing a goal state, at which point we conclude the partial plan corresponding to the removed goal state is in fact a path to get from the start state to the goal state. This procedure we have just outlined is known as \textbf{tree search}, and the pseudocode for it is presented below:
+The standard protocol for finding a plan to get from the start state to a goal state is to maintain an outer \textbf{fringe} of partial plans derived from the search tree. We continually \textbf{expand} our fringe by removing a node (which is selected using our given \textbf{strategy}) corresponding to a partial plan from the fringe, and replacing it on the fringe with all its children. Removing and replacing an element on the fringe with its children corresponds to discarding a single length $n$ plan and bringing all length $(n+1)$ plans that stem from it into consideration. We continue this until eventually removing a goal state off the fringe, at which point we conclude the partial plan corresponding to the removed goal state is in fact a path to get from the start state to the goal state. This procedure we have just outlined is known as \textbf{tree search}, and the pseudocode for it is presented below:
 	\begin{center}
 		\includegraphics[height=5cm,width=15cm]{img/tree_search_pseudocode}
 	\end{center}
@@ -103,7 +103,7 @@ The standard protocol for finding a plan to get from the start state to a goal s
 When we have no knowledge of the location of goal states in our search tree, we are forced to select our strategy for tree search from one of the techniques that falls under the umbrella of \textbf{uninformed search}. We'll now cover three such strategies in succession: depth-first search, breadth-first search, and uniform cost search. Along with each strategy, some rudimentary properties of the strategy are presented as well, in terms of the following:
 	\begin{itemize}
 		\item The \textbf{completeness} of each search strategy - if there exists a solution to the search problem, is the strategy guaranteed to find it given infinite computational resources?
-		\item The \textbf{optimality} of each search strategy - is the strategy guaranteed to find the least cost path to a goal state?
+		\item The \textbf{optimality} of each search strategy - is the strategy guaranteed to find the lowest cost path to a goal state?
 		\item The \textbf{branching factor} $b$ - The increase in the number of nodes on the fringe each time a fringe node is dequeued and replaced with its children is $O(b)$. At depth $k$ in the search tree, there exists $O(b^k)$ nodes.
 		\item The maximum depth $m$.
 		\item The depth of the shallowest solution $s$.
@@ -125,7 +125,7 @@ When we have no knowledge of the location of goal states in our search tree, we 
 \subsection*{Breadth-First Search}
 \begin{itemize}
 \item \textit{Description} - Breadth-first search is a strategy for exploration that always selects the \textit{shallowest} fringe node from the start node for expansion. 
-\item \textit{Fringe representation} - Since we wish to visit nodes in order of insertion, we desire a structure that outputs the oldest enqueued object to represent our fringe. For this, BFS uses a first-in, first-out (FIFO) queue, which does exactly this.
+\item \textit{Fringe representation} - If we want to visit shallower nodes before deeper nodes, we must visit nodes in their order of insertion. Hence, we desire a structure that outputs the oldest enqueued object to represent our fringe. For this, BFS uses a first-in, first-out (FIFO) queue, which does exactly this.
 \begin{center}
 	\includegraphics[width=7cm, height=4cm]{img/bfs}
 \end{center}
@@ -158,7 +158,7 @@ Uniform cost search is good because it's both complete and optimal, but it can b
 \begin{center}
 \includegraphics{img/manhattan}
 \end{center}
-The above visualization shows the relaxed problem that the Manhattan distance helps solve - assuming Pacman desires to get to the bottom left corner of the maze, it computes the distance from Pacman's current location to Pacman's desired location assuming a lack of walls in the maze. This distance is the \textit{exact} goal distance in the relaxed search problem, and correspondingly is the \textit{estimated} goal distance in the actual search problem. With heuristics, it becomes very easy to implement logic in our agent that enables them to "prefer" states that are closer to goal states when deciding which action to perform. This concept of preference is very powerful, and is utilized by the following two search algorithms that implement heuristic functions: greedy search and A*.
+The above visualization shows the relaxed problem that the Manhattan distance helps solve - assuming Pacman desires to get to the bottom left corner of the maze, it computes the distance from Pacman's current location to Pacman's desired location \textit{assuming a lack of walls in the maze}. This distance is the \textit{exact} goal distance in the relaxed search problem, and correspondingly is the \textit{estimated} goal distance in the actual search problem. With heuristics, it becomes very easy to implement logic in our agent that enables them to "prefer" expanding states that are estimated to be closer to goal states when deciding which action to perform. This concept of preference is very powerful, and is utilized by the following two search algorithms that implement heuristic functions: greedy search and A*.
 
 \subsection*{Greedy Search}
 \begin{itemize}
@@ -201,30 +201,32 @@ Now that we've discussed heuristics and how they are applied in both greedy and 
 \item $h(n)$ - The \textit{heuristic value} function, used by greedy search to determine expansion order.
 \item $f(n)$ - The function used by A* search to determine expansion order. $f(n) = g(n) + h(n)$.
 \end{itemize}
-
 Before attacking the question of what constitutes a "good" heuristic, we must first answer the question of whether A* maintains its properties of completeness and optimality regardless of the heuristic function we use. Indeed, it's very easy to find heuristics that break these two coveted properties. As an example, consider the heuristic function $h(n) = 1 - g(n)$. Regardless of the search problem, using this heuristic yields 
 \begin{eqnarray*}
 	f(n) &=& g(n) + h(n) \\
 	&=& g(n) + (1 - g(n)) \\
 	&=& 1
 \end{eqnarray*}
-
-Hence, such a heuristic reduces A* search to BFS, where all edge costs are equivalent. As we've already shown, BFS is not guaranteed to be optimal. \newline
+Hence, such a heuristic reduces A* search to BFS, where all edge costs are equivalent. As we've already shown, BFS is not guaranteed to be optimal.
 
 The condition required for optimality when using A* tree search is known as \textbf{admissibility}. The admissibility constraint states that the value estimated by an admissible heuristic is neither negative nor an overestimate. Defining $h^*(n)$ as the true optimal cost to reach a goal state from a given node $n$, we can formulate the admissibility constraint mathematically as follows: 
 
 $$\forall{n}, 0 \leq h(n) \leq h^*(n)$$
+\textbf{Theorem.} For a given search problem, if the admissibility constraint is satisfied by a heuristic function $h$, using A* tree search with $h$ on that search problem will yield an optimal solution.
 
-\textit{Proof.} Assume two reachable goal states are located in the search tree for a given search problem, an optimal goal $A$ and a suboptimal goal $B$. Some ancestor $n$ of $A$ (including perhaps $A$ itself) must currently be on the fringe, since $A$ is reachable from the start state. We claim $n$ will be selected for expansion before $B$, using the following two statements:
-	\begin{itemize}
+\textit{Proof.} Assume two reachable goal states are located in the search tree for a given search problem, an optimal goal $A$ and a suboptimal goal $B$. Some ancestor $n$ of $A$ (including perhaps $A$ itself) must currently be on the fringe, since $A$ is reachable from the start state. We claim $n$ will be selected for expansion before $B$, using the following three statements:
+	\begin{enumerate}
 		\item $f(n) \leq f(A)$, because $n$ is an ancestor of $A$ and so is expanded before $A$.
-		\item $f(A) < f(B)$, because $A$ is given to be optimal and $B$ is given to be suboptimal.
-	\end{itemize}
-A simple consequence of combining the two above inequalities is the following:
+		\item $g(A) < g(B)$. Because $A$ is given to be optimal and $B$ is given to be suboptimal, we can conclude that $A$ has a lower backwards cost to the start state than $B$.
+		\item $h(A) = h(B) = 0$, because we are given that our heuristic satisfies the admissibility constraint. Since both $A$ and $B$ are both goal states, the true optimal cost to a goal state from $A$ or $B$ is simply $h^*(n) = 0$; hence $0 \leq h(n) \leq 0$.
+	\end{enumerate}
+We can combine statements 2. and 3. to conclude that $f(A) < f(B)$ as follows:
+$$f(A) = g(A) + h(A) = g(A) < g(B) = g(B) + h(B) = f(B)$$
+A simple consequence of combining the above derived inequality with statement 1. is the following:
  $$f(n) \leq f(A) \wedge f(A) < f(B) \Longrightarrow f(n) < f(B)$$
- Hence, we can conclude that $n$ is expanded before $B$. Because we have proven this for arbitrary $n$, we can conclude that \textit{all} ancestors of $A$ (including $A$ itself) expand before $B$. $\Box$\newline
+ Hence, we can conclude that $n$ is expanded before $B$. Because we have proven this for arbitrary $n$, we can conclude that \textit{all} ancestors of $A$ (including $A$ itself) expand before $B$. $\Box$
 
-One problem we found above with tree search was that in some cases it could fail to ever find a solution, getting stuck searching the same cycle in the state space graph infinitely. Even in situations where our search technique doesn't involve such an infinite loop, it's often the case that we revisit the same node multiple times because there's multiple ways to get to that same node. This leads to exponentially more work, and the natural solution is to simply keep track of which states you've already visited, and never visit them again. More explicitly, maintain a "closed" set of visited nodes while utilizing your search method of choice. Then, ensure that each node isn't already in the set before expansion and add it to the set after expansion if it's not. Tree search with this added optimization is known as \textbf{graph search}, and the pseudocode for it is presented below:
+One problem we found above with tree search was that in some cases it could fail to ever find a solution, getting stuck searching the same cycle in the state space graph infinitely. Even in situations where our search technique doesn't involve such an infinite loop, it's often the case that we revisit the same node multiple times because there's multiple ways to get to that same node. This leads to exponentially more work, and the natural solution is to simply keep track of which states you've already expanded, and never expand them again. More explicitly, maintain a "closed" set of expanded nodes while utilizing your search method of choice. Then, ensure that each node isn't already in the set before expansion and add it to the set after expansion if it's not. Tree search with this added optimization is known as \textbf{graph search}, and the pseudocode for it is presented below:
 \begin{center}
 	\includegraphics[height=6cm,width=15cm]{img/graph_search_pseudocode}
 \end{center}
@@ -232,27 +234,38 @@ Note that in implementation, it's critically important to store the closed set a
 \begin{center}
 	\includegraphics[height=7cm]{img/bad_graph_search}
 \end{center}
-In the above example, it's clear that the optimal route is to follow $S \rightarrow A \rightarrow C \rightarrow G$, yielding a total path cost of $1 + 1 + 2 = 5$. The only other path to the goal, $S \rightarrow B \rightarrow C \rightarrow G$ has a path cost of $1 + 2 + 2 = 6$. However, because the heuristic value of node $A$ is so much larger than the heuristic value of node $B$, node $C$ is first expanded along the second, suboptimal path as a child of node $B$. It's then placed into the "closed" set, and so A* graph search fails to reexpand it when it visits it as a child of $A$. Hence, to maintain completeness and optimality under A* graph search, we need an even stronger property than admissibility, \textbf{consistency}. The central idea of consistency is that rather than only enforcing that a heuristic underestimates the \textit{total} distance to a goal from any given node, the heuristic cost is less than the actual cost across every edge in the state space graph. The heuristic cost is simply the difference in heuristic values for two connected nodes. Mathematically, consistency can be expressed as follows:
+In the above example, it's clear that the optimal route is to follow $S \rightarrow A \rightarrow C \rightarrow G$, yielding a total path cost of $1 + 1 + 2 = 5$. The only other path to the goal, $S \rightarrow B \rightarrow C \rightarrow G$ has a path cost of $1 + 2 + 2 = 6$. However, because the heuristic value of node $A$ is so much larger than the heuristic value of node $B$, node $C$ is first expanded along the second, suboptimal path as a child of node $B$. It's then placed into the "closed" set, and so A* graph search fails to reexpand it when it visits it as a child of $A$, so it never finds the optimal solution. Hence, to maintain completeness and optimality under A* graph search, we need an even stronger property than admissibility, \textbf{consistency}. The central idea of consistency is that rather than only enforcing that a heuristic underestimates the \textit{total} distance to a goal from any given node, the heuristic cost is less than the actual cost across every edge in the state space graph. The heuristic cost is simply the difference in heuristic values for two connected nodes. Mathematically, the consistency constraint can be expressed as follows:
+$$\forall A,C \quad 0 \leq h(A) - h(C) \leq cost(A,C)$$
+\textbf{Theorem.} For a given search problem, if the consistency constraint is satisfied by a heuristic function $h$, using A* graph search with $h$ on that search problem will yield an optimal solution.
 
-$$\forall A,C \quad h(A) - h(C) \leq cost(A,C)$$
+\textit{Proof.} In order to prove the above theorem, we first prove that when running A* graph search with a consistent heuristic, whenever we remove a node for expansion, we've found the optimal path to that node.
 
-A couple of important notes before we proceed: for heuristics that are either admissible/consistent to be valid, it must by definition be the case that $h(G) = 0$ for any goal state $G$. Additionally, consistency is not only a stronger constraint than admissibility, consistency also implies admissibility. This stems simply from the fact that if no edge costs are overestimates (as guaranteed by consistency), the total estimated cost from any node to a goal will also fail to be an overestimate.
+Using the consistency constraint, we can show that the values of $f(n)$ for nodes along any plan are nondecreasing. Define two nodes, $n$ and $n'$, where $n'$ is a successor of $n$. Then:
+	\begin{eqnarray*}
+		f(n') &=& g(n') + h(n') \\
+		&=& g(n) + cost(n, n') + h(n') \\
+		&\geq& g(n) + h(n) \\
+		&=& f(n)
+	\end{eqnarray*}
+If for every parent-child pair $(n', n)$ along a path, $f(n') \geq f(n)$, then it must be the case that the values of $f(n)$ are nondecreasing along that path. With this information, we can now show that whenever a node $n$ is removed for expansion, its optimal path has been found. Assume towards a contradiction that this is false - that when $n$ is removed from the fringe, the path found to $n$ is suboptimal. This means that there must be some ancestor of $n$, $n''$, on the fringe that was never expanded but is on the optimal path to $n$. Contradiction! We've already shown that values of $f$ along a path are nondecreasing, and so $n''$ would have been removed for expansion before $n$. 
 
-Consider the following three-node network for an example of consistency building upon admissibility:
+All we have left to show to complete our proof is that an optimal goal $A$ will always be removed for expansion and returned before any suboptimal goal $B$. This is trivial, since $h(A) = h(B) = 0$, so $$f(A) = g(A) < g(B) = f(B)$$just as in our proof of optimality of A* tree search under the admissibility constraint. Hence, we can conclude that A* graph search is optimal under a consistent heuristic. $\Box$
+
+A couple of important highlights from the discussion above before we proceed: for heuristics that are either admissible/consistent to be valid, it must by definition be the case that $h(G) = 0$ for any goal state $G$. Additionally, consistency is not just a stronger constraint than admissibility, consistency \textit{implies} admissibility. This stems simply from the fact that if no edge costs are overestimates (as guaranteed by consistency), the total estimated cost from any node to a goal will also fail to be an overestimate.
+
+Consider the following three-node network for an example of an admissible but inconsistent heuristic:
 	\begin{center}
 		\includegraphics[height=4.9cm]{img/consistent_heuristic}
 	\end{center}
-The red dotted line corresponds to the total estimated goal distance. If $h(A) = 4$, then the heuristic is admissible, as the distance from $A$ to the goal is $4 \geq h(A)$, and same for $h(C) = 1 \leq 3$. However, the heuristic cost from $A$ to $C$ is $h(A) - h(C) = 4 - 1 = 3$. Our heuristic estimates the cost of the edge between $A$ and $C$ to be $3$ while the true value is $cost(A,C) = 1$, a smaller value. Since $h(A) - h(C) \nleq cost(A,C)$, this heuristic is not consistent.
+The red dotted line corresponds to the total estimated goal distance. If $h(A) = 4$, then the heuristic is admissible, as the distance from $A$ to the goal is $4 \geq h(A)$, and same for $h(C) = 1 \leq 3$. However, the heuristic cost from $A$ to $C$ is $h(A) - h(C) = 4 - 1 = 3$. Our heuristic estimates the cost of the edge between $A$ and $C$ to be $3$ while the true value is $cost(A,C) = 1$, a smaller value. Since $h(A) - h(C) \nleq cost(A,C)$, this heuristic is not consistent. Running the same computation for $h(A) = 2$, however, yields $h(A) - h(C) = 2 - 1 = 1 \leq cost(A,C)$. Thus, using $h(A) = 2$ makes our heuristic consistent.
 
 \subsection*{Dominance}
 Now that we've established the properties of admissibility and consistency and their roles in maintaining the optimality of A* search, we can return to our original problem of creating "good" heuristics, and how to tell if one heuristic is better than another. The standard metric for this is that of \textbf{dominance}. If heuristic $a$ is dominant over heuristic $b$, then the estimated goal distance for $a$ is greater than the estimated goal distance for $b$ for every node in the state space graph. Mathematically,
-
 $$\forall n: h_a(n) \geq h_b(n)$$
-
-Dominance very intuitively captures the idea of one heuristic being better than another - if one admissible/consistent heuristic is dominant over another, it must be better because it will always more closely estimate the distance to a goal from any given state. Additionally, the \textbf{trivial heuristic} is defined as $h(n) = 0$, and using it reduces A* search to UCS. All admissible heuristics dominate the trivial heuristic. The trivial heuristic is often incorporated in a \textbf{semi-lattice} for a search problem, a dominance hierarchy of which it is located at the bottom. Below is an example of a semi-lattice that incorporates various heuristics $h_a, h_b,$ and $h_c$ ranging from the trivial heuristic at the bottom and the exact goal distance at the top:
-\begin{center}
+Dominance very intuitively captures the idea of one heuristic being better than another - if one admissible/consistent heuristic is dominant over another, it must be better because it will always more closely estimate the distance to a goal from any given state. Additionally, the \textbf{trivial heuristic} is defined as $h(n) = 0$, and using it reduces A* search to UCS. All admissible heuristics dominate the trivial heuristic. The trivial heuristic is often incorporated at the base of a \textbf{semi-lattice} for a search problem, a dominance hierarchy of which it is located at the bottom. Below is an example of a semi-lattice that incorporates various heuristics $h_a, h_b,$ and $h_c$ ranging from the trivial heuristic at the bottom to the exact goal distance at the top:
+\begin{center} t
 	\includegraphics[height=6cm]{img/semi-lattice}
 \end{center}
-As a general rule, the $\max$ function applied to two admissible heuristics will also always be admissible. This is simply a consequence of both values output by the two heuristics for any given state both being constrained by the admissibility condition, $0 \leq h(n) \leq h^*(n)$. The maximum of two numbers in this range must also fall in the same range.
+As a general rule, the $\max$ function applied to multiple admissible heuristics will also always be admissible. This is simply a consequence of all values output by the heuristics for any given state being constrained by the admissibility condition, $0 \leq h(n) \leq h^*(n)$. The maximum of numbers in this range must also fall in the same range. The same can be shown easily for multiple consistent heuristics as well. It's common practice to generate multiple admissible/consistent heuristics for any given search problem and compute the $\max$ over the values output by them to generate a heuristic that dominates (and hence is better than) all of them individually.
 
 \end{document}
