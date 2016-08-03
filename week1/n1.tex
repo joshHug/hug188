@@ -211,7 +211,7 @@ Hence, such a heuristic reduces A* search to BFS, where all edge costs are equiv
 
 The condition required for optimality when using A* tree search is known as \textbf{admissibility}. The admissibility constraint states that the value estimated by an admissible heuristic is neither negative nor an overestimate. Defining $h^*(n)$ as the true optimal cost to reach a goal state from a given node $n$, we can formulate the admissibility constraint mathematically as follows: 
 
-$$\forall{n}, 0 \leq h(n) \leq h^*(n)$$
+$$\forall{n}, \:\: 0 \leq h(n) \leq h^*(n)$$
 \textbf{Theorem.} For a given search problem, if the admissibility constraint is satisfied by a heuristic function $h$, using A* tree search with $h$ on that search problem will yield an optimal solution.
 
 \textit{Proof.} Assume two reachable goal states are located in the search tree for a given search problem, an optimal goal $A$ and a suboptimal goal $B$. Some ancestor $n$ of $A$ (including perhaps $A$ itself) must currently be on the fringe, since $A$ is reachable from the start state. We claim $n$ will be selected for expansion before $B$, using the following three statements:
