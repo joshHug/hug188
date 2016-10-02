@@ -156,7 +156,7 @@ $$Q_{k+1}(s, a) \leftarrow \sum_{s'}T(s, a, s')[R(s, a, s') + \gamma \max_{a'} Q
 Note that this update is only a slight modification over the update rule for value iteration. Indeed, the only real difference is that the position of the $\max$ operator over actions has been changed since we select an action before transitioning when we're in a state, but we transition before selecting a new action when we're in a q-state. 
 
 With this new update rule under our belt, Q-learning is derived essentially the same way as TD learning, by acquiring \textbf{q-value samples}:
-$$sample = R(s, a, s') + \max_{a'}Q(s', a')$$
+$$sample = R(s, a, s') + \gamma \max_{a'}Q(s', a')$$
 and incoporating them into an exponential moving average.
 $$Q(s, a) \leftarrow (1-\alpha)Q(s, a) + \alpha \cdot sample$$
 As long as we spend enough time in exploration and decrease the learning rate $\alpha$ at an appropriate pace, Q-learning learns the optimal q-values for every q-state. This is what makes Q-learning so revolutionary - while TD learning and direct evaluation learn the values of states under a policy by following the policy before determining policy optimality via other techniques, Q-learning can learn the optimal policy directly even by taking suboptimal or random actions. This is called \textbf{off-policy learning} (contrary to direct evaluation and TD learning, which are examples of \textbf{on-policy learning}).

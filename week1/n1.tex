@@ -139,13 +139,13 @@ When we have no knowledge of the location of goal states in our search tree, we 
 
 \subsection*{Uniform Cost Search}
 \begin{itemize}
-\item \textit{Description} - Uniform cost search (UCS), our last strategy, is a strategy for exploration that always selects the \textit{lowest cost} fringe node from the start node for expansion. 
+\item \textit{Description} - Uniform cost search (UCS), our last strategy, is a strategy for exploration that always selects the \textit{lowest cost} fringe node from the start node for expansion.
 \item \textit{Fringe representation} - To represent the fringe for UCS, the choice is usually a heap-based priority queue, where the weight for a given enqueued node is the path cost from the start node to that node. Intuitively, a priority queue constructed in this manner simply reshuffles itself to maintain the desired ordering by path cost as we remove the current minimum cost path and replace it with its children.
 \begin{center}
 	\includegraphics[width=7cm, height=4cm]{img/ucs}
 \end{center}
 \item \textit{Completeness} - Uniform cost search is complete. If a goal state exists, it must have some finite length shortest path; hence, UCS must eventually find this shortest length path.
-\item \textit{Optimality} - UCS is also optimal. By construction, since we explore nodes in order of increasing path cost, we're guaranteed to find the lowest-cost path to a goal state.
+\item \textit{Optimality} - UCS is also optimal if we assume all edge costs are nonnegative. By construction, since we explore nodes in order of increasing path cost, we're guaranteed to find the lowest-cost path to a goal state. Note that having negative edge costs in our graph can make nodes on a path have decreasing length, ruining our guarantee of optimality.
 \item \textit{Time Complexity} - Let us define the optimal past cost as $C^*$ and the minimal cost between two nodes in the state space graph as $\epsilon$. Then, we must roughly explore all nodes at depths ranging from 1 to $C^*/\epsilon$, leading to an runtime of $O(b^{C^*/\epsilon})$.
 \item \textit{Space Complexity} - Roughly, the fringe will contain all nodes at the level of the cheapest solution, so the space complexity of UCS is estimated as $O(b^{C^*/\epsilon})$.
 \end{itemize}
@@ -232,7 +232,7 @@ One problem we found above with tree search was that in some cases it could fail
 \begin{center}
 	\includegraphics[height=6cm,width=15cm]{img/graph_search_pseudocode}
 \end{center}
-Note that in implementation, it's critically important to store the closed set as a disjoint set and not a list. Storing it as a list requires costs $O(n)$ operations to check for membership, which eliminates the performance improvement graph search is intended to provide. An additional caveat of graph search is that it tends to ruin the completeness and optimality of A*, even under admissible heuristics. Consider the following simple state space graph and corresponding search tree, annotated with weights and heuristic values:
+Note that in implementation, it's critically important to store the closed set as a disjoint set and not a list. Storing it as a list requires costs $O(n)$ operations to check for membership, which eliminates the performance improvement graph search is intended to provide. An additional caveat of graph search is that it tends to ruin the optimality of A*, even under admissible heuristics. Consider the following simple state space graph and corresponding search tree, annotated with weights and heuristic values:
 \begin{center}
 	\includegraphics[height=7cm]{img/bad_graph_search}
 \end{center}
@@ -265,7 +265,7 @@ The red dotted line corresponds to the total estimated goal distance. If $h(A) =
 Now that we've established the properties of admissibility and consistency and their roles in maintaining the optimality of A* search, we can return to our original problem of creating "good" heuristics, and how to tell if one heuristic is better than another. The standard metric for this is that of \textbf{dominance}. If heuristic $a$ is dominant over heuristic $b$, then the estimated goal distance for $a$ is greater than the estimated goal distance for $b$ for every node in the state space graph. Mathematically,
 $$\forall n: h_a(n) \geq h_b(n)$$
 Dominance very intuitively captures the idea of one heuristic being better than another - if one admissible/consistent heuristic is dominant over another, it must be better because it will always more closely estimate the distance to a goal from any given state. Additionally, the \textbf{trivial heuristic} is defined as $h(n) = 0$, and using it reduces A* search to UCS. All admissible heuristics dominate the trivial heuristic. The trivial heuristic is often incorporated at the base of a \textbf{semi-lattice} for a search problem, a dominance hierarchy of which it is located at the bottom. Below is an example of a semi-lattice that incorporates various heuristics $h_a, h_b,$ and $h_c$ ranging from the trivial heuristic at the bottom to the exact goal distance at the top:
-\begin{center} t
+\begin{center}
 	\includegraphics[height=6cm]{img/semi-lattice}
 \end{center}
 As a general rule, the $\max$ function applied to multiple admissible heuristics will also always be admissible. This is simply a consequence of all values output by the heuristics for any given state being constrained by the admissibility condition, $0 \leq h(n) \leq h^*(n)$. The maximum of numbers in this range must also fall in the same range. The same can be shown easily for multiple consistent heuristics as well. It's common practice to generate multiple admissible/consistent heuristics for any given search problem and compute the $\max$ over the values output by them to generate a heuristic that dominates (and hence is better than) all of them individually.
