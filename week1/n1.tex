@@ -146,7 +146,7 @@ When we have no knowledge of the location of goal states in our search tree, we 
 \end{center}
 \item \textit{Completeness} - Uniform cost search is complete. If a goal state exists, it must have some finite length shortest path; hence, UCS must eventually find this shortest length path.
 \item \textit{Optimality} - UCS is also optimal if we assume all edge costs are nonnegative. By construction, since we explore nodes in order of increasing path cost, we're guaranteed to find the lowest-cost path to a goal state. Note that having negative edge costs in our graph can make nodes on a path have decreasing length, ruining our guarantee of optimality.
-\item \textit{Time Complexity} - Let us define the optimal past cost as $C^*$ and the minimal cost between two nodes in the state space graph as $\epsilon$. Then, we must roughly explore all nodes at depths ranging from 1 to $C^*/\epsilon$, leading to an runtime of $O(b^{C^*/\epsilon})$.
+\item \textit{Time Complexity} - Let us define the optimal path cost as $C^*$ and the minimal cost between two nodes in the state space graph as $\epsilon$. Then, we must roughly explore all nodes at depths ranging from 1 to $C^*/\epsilon$, leading to an runtime of $O(b^{C^*/\epsilon})$.
 \item \textit{Space Complexity} - Roughly, the fringe will contain all nodes at the level of the cheapest solution, so the space complexity of UCS is estimated as $O(b^{C^*/\epsilon})$.
 \end{itemize}
 
