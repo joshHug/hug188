@@ -1,0 +1,93 @@
+\documentclass[11pt,fleqn]{article}
+\usepackage{../cs188,latexsym,epsf, amsmath,amsfonts,graphicx,url}
+\lecture{6}
+\def\title{Note \the\lecturenumber}
+\begin{document}
+\maketitle
+
+
+\iffalse
+\documentclass[11pt,fleqn]{article}
+\usepackage{latexsym,epsf,amsmath,amsfonts,graphicx,url}
+
+\title{Note 6}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+\begin{document}
+
+\maketitle
+\fi
+
+\section*{Bayes' Nets}
+In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Bayesian networks} (Bayes' nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
+
+\section*{Representation}
+We've thrown around the word \textbf{model} quite frequently, and it's about time we formally defined what constitutes a model. In the context of Bayes' nets, a model is simply a complex \textbf{joint distribution} of probabilities, a table of probabilities which captures the likelihood of multiple events occuring simultaneously. <HEH, CLEAN THIS UP> Naturally, representing an entire joint distribution in the memory of a computer is not very scalable - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! Bayes' nets avoid this issue by choosing to store information in small, local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions.
+
+
+MAKE NOTATIONAL NOTE ABOUT VARIABLES THAT ARE UPPERCASE VS LOWERCASE
+
+models capture a way the world works - they are always a simplification - key
+all models are wrong, but some will still be useful for solving real problems in the real world
+may not account for every variable or every interactio nbetween variables
+
+we can reason about unknowns given evidence
+if we have n variables each with domain of size d, then our joint probability table will be size $d^n$ -- this is bad!!
+
+two variables are independent if for all x, y P(x)P(y) = P(x, y) -- their distributions FACTOR into simpler distributions
+
+assuming independence is a simplifying modeling assumption
+
+conditional independence is very useful - more useful than unconditinoal independence because it mmeans variables don't interact with one another
+P(x,y | z) = P(x | z)P(y | z)
+
+examples
+
+application of chain rule, then simplyfying with conditional independence - EXPLAIN THIS CAREFULLY
+
+BAYES NETS -- the joint distribution is usually too hard to represent in many cases - you have a whole bunch of variables with many domains $d^N$ scales very quickly
+the solution is to have a more structured representation in the form of bayes nets to decompose a large joint distribution into simple local distributions which can then be pieced together to build up any other more global distributions that are desired
+
+NOTATION: nodes (variables), arcs (interactions between variables -- formally encode conditional independence)
+bayes nets are directed acyclic graphs
+have a conditional distribution for each node X
+P(X | a1 a2 ... an) each thing is a key thing conditional based on parents
+
+how to convert from bayes to full join probability - product P(xi | parents(xi)) <-- show validity of this using chain rule
+
+
+causality??
+
+\section*{Inference}
+
+INFERENCE
+
+BY ENUMERATION
+Given some evidence, calculate some useful probability you want to know
+inference is np-complete, but you can improve its performance usually in a key way
+evidence, query, and hidden variables
+evidence - things we have observed
+query - what we want to predict
+hidden - variables in the bayes net we must get rid of 
+
+VARIABLE ELIMINATION
+optimization on inference by enumeration by summing out at intermediary steps rather than just at the end
+select hidden variables in some order - join all factors mentioning H then sum out over it
+how to select ordering of variables? -- computational complexity very dependent on the largest factor involved
+
+different types of factors
+
+
+\subsection*{D-Separation}
+One very common question about Bayes' nets that comes up very frequently both in this class and in application is that of the conditional independence between its variables. This is something that's often incredibly unintuitive to reason through
+
+\section*{Sampling}
+
+
+
+\end{document}
