@@ -27,8 +27,18 @@
 In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Bayesian networks} (Bayes' nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
 
 \section*{Representation}
-We've thrown around the word \textbf{model} quite frequently, and it's about time we formally defined what constitutes a model. In the context of Bayes' nets, a model is simply a complex \textbf{joint distribution} of probabilities, a table of probabilities which captures the likelihood of multiple events occuring simultaneously. <HEH, CLEAN THIS UP> Naturally, representing an entire joint distribution in the memory of a computer is not very scalable - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! Bayes' nets avoid this issue by choosing to store information in small, local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions.
 
+In previous sections of this class, we modeled the world as existing in a specific state that is always known. For the next several weeks, we will instead use a new model where each possible state for the universe has its own probability. For example, we might build a weather model, where the state consists of the season, temperature and weather. Our model might say that $P(winter, 35 fahrenheit, cloudy) = 0.00023$.
+
+In such a model, the state of the universe is simply a \textbf{joint distribution}, i.e. a table of probabilities which captures the likelihood of multiple events [check] occuring simultaneously. 
+
+Given such a model, we can trivially perform any kind of probability inference using the intuitive \textbf{Inference by Enumeration} technique discussed during the probability lecture.
+
+Naturally, representing an entire joint distribution in the memory of a computer is not very scalable - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! 
+
+Bayes nets avoid this issue by choosing to store information in small, local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions. 
+
+Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. A node is conditionally independent of its ancestors given all of its parents. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
 
 MAKE NOTATIONAL NOTE ABOUT VARIABLES THAT ARE UPPERCASE VS LOWERCASE
 
