@@ -23,8 +23,8 @@
 \maketitle
 \fi
 
-\section*{Bayes' Nets}
-In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Bayesian networks} (Bayes' nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
+\section*{Bayes Nets}
+In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Bayesian networks} (Bayes nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
 
 \section*{Representation}
 
@@ -40,25 +40,26 @@ Bayes nets avoid this issue by choosing to store information in small, local pro
 
 Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. A node is conditionally independent of its ancestors given all of its parents. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
 
-MAKE NOTATIONAL NOTE ABOUT VARIABLES THAT ARE UPPERCASE VS LOWERCASE
+As an example of a Bayes Net, consider a model where we have five binary random variables described below:
 
-models capture a way the world works - they are always a simplification - key
-all models are wrong, but some will still be useful for solving real problems in the real world
-may not account for every variable or every interactio nbetween variables
+\begin{itemize}
+\item B: Burglary occurs.
+\item A: Alarm goes off.
+\item E: Earthquake occurs.
+\item J: John calls.
+\item M: Mary calls.
+\end{itemize}
 
-we can reason about unknowns given evidence
-if we have n variables each with domain of size d, then our joint probability table will be size $d^n$ -- this is bad!!
+Assume the alarm can go off if either a burglary or an earthquake occurs, and that Mary and John will call if they hear the alarm. In this case, we can represent the natural conditional independences with the graph shown below.
 
-two variables are independent if for all x, y P(x)P(y) = P(x, y) -- their distributions FACTOR into simpler distributions
+\begin{center}	
+	\includegraphics[width=10cm]{img/alarm_model}
+\end{center}
 
-assuming independence is a simplifying modeling assumption
+Models capture a way the world works - they are always a simplification - key
+all models are wrong, but some will still be useful for solving real problems in the real world. They may may not account for every variable or even every interaction between variables.
 
-conditional independence is very useful - more useful than unconditinoal independence because it mmeans variables don't interact with one another
-P(x,y | z) = P(x | z)P(y | z)
-
-examples
-
-application of chain rule, then simplyfying with conditional independence - EXPLAIN THIS CAREFULLY
+\section*{Representation}
 
 BAYES NETS -- the joint distribution is usually too hard to represent in many cases - you have a whole bunch of variables with many domains $d^N$ scales very quickly
 the solution is to have a more structured representation in the form of bayes nets to decompose a large joint distribution into simple local distributions which can then be pieced together to build up any other more global distributions that are desired
