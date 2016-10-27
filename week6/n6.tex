@@ -61,18 +61,22 @@ all models are wrong, but some will still be useful for solving real problems in
 
 \section*{Representation}
 
-BAYES NETS -- the joint distribution is usually too hard to represent in many cases - you have a whole bunch of variables with many domains $d^N$ scales very quickly
-the solution is to have a more structured representation in the form of bayes nets to decompose a large joint distribution into simple local distributions which can then be pieced together to build up any other more global distributions that are desired
+More formally, we say that a Bayes Net consists of:
+\begin{itemize}
+\item A directed acyclic graph of nodes, one per variable X.
+\item A conditional distribution for each node $P(X | A_1 ... A_n)$, where $A_i$ is the ith parent of X, stored as a \textbf{conditional probability table} or CPT.
+\end{itemize}
 
-NOTATION: nodes (variables), arcs (interactions between variables -- formally encode conditional independence)
-bayes nets are directed acyclic graphs
-have a conditional distribution for each node X
-P(X | a1 a2 ... an) each thing is a key thing conditional based on parents
+Given all of the CPTs for a graph, we can calculate the probability of a given assignment using the chain rule: $P(x_1, x_2, ..., x_n) = \prod_{i=1}^n{x_i | parents(X_i)}$. 
 
-how to convert from bayes to full join probability - product P(xi | parents(xi)) <-- show validity of this using chain rule
+For the alarm model above, we might calculate the probability of one event as follows: $P(-b, -e, +a, +j, -m) = P(-b) \cdot P(-e) \cdot P(+a | -b, -e) \cdot P(+j | +a) \cdot P(-m | +a)$.
 
+This works because of the conditional indepences given by the graph. Specifically, we rely on the fact that $P(x_i | x_1, ..., x_{i-1}) = P(x_i | parents(X_i))$. Or in other words, that the probability of a specific value of $X_i$ depends only on the values assigned to $X_i$'s parents.
 
-causality??
+While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightArrow alarm$, the direction of the arrows does not 
+
+While The direction of arrows in a Bayes Net do not change its expressive power. 
+
 
 \section*{Inference}
 
