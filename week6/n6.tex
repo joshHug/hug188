@@ -73,36 +73,47 @@ For the alarm model above, we might calculate the probability of one event as fo
 
 This works because of the conditional indepences given by the graph. Specifically, we rely on the fact that $P(x_i | x_1, ..., x_{i-1}) = P(x_i | parents(X_i))$. Or in other words, that the probability of a specific value of $X_i$ depends only on the values assigned to $X_i$'s parents.
 
-While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightArrow alarm$, the direction of the arrows does not 
-
-While The direction of arrows in a Bayes Net do not change its expressive power. 
-
+While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightArrow alarm$, the direction of the arrows does not change the space of possible distributions represented by the Bayes Net. That is, if you flip an arrow, it is possible to pick new values for the CPTs such that the joint distribution is unchanged. Or stated differently: Our model is ultimately a joint distribution over all variables. The direction of the arrows does not affect which values are possible in the joint table, though the absence of arrows may restrict the possible values for the joint table, e.g. if there are no arrows, the values in the joint PDF table will need to reflect the fact that all variables are independent.
 
 \section*{Inference}
 
-INFERENCE
+Inference is the process of calculating the joint PDF for some set of query variables based on some set of observed variables. We can solve this problem naively by forming the joint PDF and using Inference by Enumeration. This requires creation and iteration over an exponentially large table.
 
-BY ENUMERATION
-Given some evidence, calculate some useful probability you want to know
-inference is np-complete, but you can improve its performance usually in a key way
-evidence, query, and hidden variables
-evidence - things we have observed
-query - what we want to predict
-hidden - variables in the bayes net we must get rid of 
+An alternate approach is to \textbf{eliminate} variables one by one. To eliminate a variable X, we: 
 
-VARIABLE ELIMINATION
-optimization on inference by enumeration by summing out at intermediary steps rather than just at the end
-select hidden variables in some order - join all factors mentioning H then sum out over it
-how to select ordering of variables? -- computational complexity very dependent on the largest factor involved
+\begin{itemize}
+\item Join (multiply together) all factors involving X.
+\item Sum out X.
+\end{itemize}
 
-different types of factors
+For example, suppose we have a model as shown below, where T, C, S, and E can take on binary values, as shown below:
 
+\begin{center}	
+	\includegraphics[width=10cm]{img/TCSE_model.png}
+\end{center}
 
-\subsection*{D-Separation}
-One very common question about Bayes' nets that comes up very frequently both in this class and in application is that of the conditional independence between its variables. This is something that's often incredibly unintuitive to reason through
+In this case, we have the factors $P(T)$, $P(C|T)$, $P(S|T)$, and $P(E|C, S)$. Suppose we want to calculate $P(T | +e)$. The naive approach would be to form the 16 row joint PDF $P(T, C, S, E)$, select only the rows corresponding to +e, then summing out C and S and finally normalizing. 
+
+The alternate approach is to eliminate C, then S, one variable at a time.
+
+Suppose we eliminate C first. In this case, we'd join (multiply) all the factors involving C, namely $P(C|T)$ and $P(+e|C, S)$. The product rule tells us that this product equals $P(C, +e | T, S)$. We'd then sum out C, leaving us with a new factor $P(+e | T, S)$. 
+
+At this point, we now have three factors $P(T)$, $P(S|T)$, and our new factor $P(+e | T, S)$. To eliminate S, we'd join (multiply) $P(S|T)$ and $P(+e | T, S)$, yielding $P(+e, S | T)$. Summing over S we'd get $P(+e | T)$.
+
+With S and T eliminated, we are left with two factors: $P(T)$ and $P(+e | T)$. Recall that our goal is to calculate $P(T | +e)$. To calculate this, we multiply our two factors, yielding $P(+e, T)$. Finally, we normalize, yielding $P(T|+e)$.
+
+While this process is more involved from a conceptual point of view, the maximum size of any factor generated is only 8 rows instead of 16 as it would be if we formed the entire joint PDF.
+
+An alternate way of looking at the problem is to observe that the calculation of $P(+e, T)$ can either be done, as it is in Inference by Enumeration, as follows:
+
+$\sum_s{\sum_c{P(T)P(s|T)P(c|T)P(+e|c,s)}}$
+
+Variable elimination is equivalent to calculating $P(+e, T)$ as follows:
+
+$P(T)\sum_s{P(s|T)\sum_e{P(c|T)P(+e|c,s)}}$
 
 \section*{Sampling}
 
-
+hello
 
 \end{document}
