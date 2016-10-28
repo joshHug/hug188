@@ -1,0 +1,62 @@
+\documentclass[11pt,fleqn]{article}
+\usepackage{../cs188,latexsym,epsf, amsmath,amsfonts,graphicx,url}
+\lecture{7}
+\def\title{Note \the\lecturenumber}
+\begin{document}
+\maketitle
+
+
+\iffalse
+\documentclass[11pt,fleqn]{article}
+\usepackage{latexsym,epsf,amsmath,amsfonts,graphicx,url}
+
+\title{Note 6}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+\begin{document}
+
+\maketitle
+\fi
+
+\section{Decision Networks}
+Decision networks combine Bayes' Nets with additional node types for actions and utilities, and are a neat way to represent a general decision problem with uncertainty.
+
+Decision networks consist of the three types of nodes:
+\begin{itemize}
+\item Change nodes (ovals):
+\item Action nodes (rectangles): 
+\item Utility nodes (diamonds):
+\end{itemize}
+
+[An example of decision network here:]
+
+Once we have a decision problem represented by a decision network, we can solve the decision problem, i.e., select the action that maximizes the expected utility, by the following algorithm. 
+
+[action selection algorithm goes here: Page 628 in Russell's book or Page 13 in the slides]
+
+
+
+\section{The Value of Information}
+In the previous lectures, we assume that all relevant information is provided to the agent before it makes its decision. In practice, this is hardly the case. \textit{One of the most important parts of decision making is knowing what information to acquire.} [An example here]. This section will introduce an important notion - \textbf{value of perfect information} (VPI) - which quantifies the additional expected utility the agent would gain if it obtains the evidence and then acts versus if it acts without the evidence.
+
+
+\subsection{General Formula}
+To derive a general formula for VPI, let us first review the definitions for the expected utility (EU) and maximum expected utility (MEU).
+
+[how EU and MEU are defined and then go to the general formula of VPI]
+
+
+[interleaves the formula with weather information example in the slides]
+
+\subsection{Properties of the Value of Information}
+
+
+
+
+
+\end{document}
