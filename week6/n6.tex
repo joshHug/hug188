@@ -23,20 +23,40 @@
 \maketitle
 \fi
 
-\section*{Bayes Nets}
-In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Bayesian networks} (Bayes nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
+\section*{Probabilistic Inference}
 
-\section*{Representation}
+In artificial intelligence, we often want to model the relationships between various nondeterministic events. If the weather predicts a 40\% chance of rain, should I carry my umbrella? How many scoops of ice cream should I get if the more scoops I get, the more likely I am to drop it all? If there was an accident 15 minutes ago on the freeway on my route to Oracle Arena to watch the Warriors' game, should I leave now or in 30 minutes? All of these questions (and innumerable more) can be answered with \textbf{Probabilistic Inference}.
 
-In previous sections of this class, we modeled the world as existing in a specific state that is always known. For the next several weeks, we will instead use a new model where each possible state for the universe has its own probability. For example, we might build a weather model, where the state consists of the season, temperature and weather. Our model might say that $P(winter, 35 fahrenheit, cloudy) = 0.00023$.
+We're assuming that you've learned the foundations of probability in CS70, so these notes will not review basic concepts of probability like PDFs, conditional probabilities, independence, and conditional independence.
 
-In such a model, the state of the universe is simply a \textbf{joint distribution}, i.e. a table of probabilities which captures the likelihood of multiple events [check] occuring simultaneously. 
+In previous sections of this class, we modeled the world as existing in a specific state that is always known. For the next several weeks, we will instead use a new model where each possible state for the universe has its own probability. For example, we might build a weather model, where the state consists of the season, temperature and weather. Our model might say that $P(winter, 35^\circ, cloudy) = 0.00023$. This number represents the probability of the specific outcome that it is winter, 35 degrees, and cloudy.
 
-Given such a model, we can trivially perform any kind of probability inference using the intuitive \textbf{Inference by Enumeration} technique discussed during the probability lecture.
+More precisely, our model is a \textbf{joint distribution}, i.e. a table of probabilities which captures the likelihood of each possible \textbf{outcome}, also known as an \textbf{assignment}. As an example, consider the table below:
+
+
+\begin{center}	
+	\includegraphics[width=10cm]{img/pdf_example}
+\end{center}
+
+This model allows us to answer questions that might be of interest to us, for example:
+
+\begin{itemize}
+\item What is the probability that it is sunny? $P(w = sunny)$
+\item What is the probability distribution for the weather, given that we know it is winter? $P(W | s = winter)$
+\item What is the probability that it is winter, given that we know it is rainy and cold? $P(s = winter | t = cold, w = rain)$
+\end{itemize}
+
+Given a joint PDF, we can trivially perform compute any desired probablity $P(Q|e_1...e_k)$ using a simple intuitive procedure known as \textbf{Inference by Enumeration}. In this procedure, we collect all the rows consistent with the evidence available (i.e. $e_1...e_k$, sum out all the hidden variables (i.e. all variables for which we do not have evidence), and finally normalize the table so that it is a probability distribution.
+
+For example, if we wanted to compute $P(W | s = winter)$, we'd select the four rows where s is winter, we'd sum out the 
+
+
+
+\section*{Bayes Nets (Representation)}
 
 Naturally, representing an entire joint distribution in the memory of a computer is not very scalable - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! 
 
-Bayes nets avoid this issue by choosing to store information in small, local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions. 
+Bayes nets avoid this issue by taking advantage of the idea of conditional probability. Rather than storing information in a giant table, it is instead distributed across a large number of smaller local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. 
 
 Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. A node is conditionally independent of its ancestors given all of its parents. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
 
@@ -73,7 +93,7 @@ For the alarm model above, we might calculate the probability of one event as fo
 
 This works because of the conditional indepences given by the graph. Specifically, we rely on the fact that $P(x_i | x_1, ..., x_{i-1}) = P(x_i | parents(X_i))$. Or in other words, that the probability of a specific value of $X_i$ depends only on the values assigned to $X_i$'s parents.
 
-While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightArrow alarm$, the direction of the arrows does not change the space of possible distributions represented by the Bayes Net. That is, if you flip an arrow, it is possible to pick new values for the CPTs such that the joint distribution is unchanged. Or stated differently: Our model is ultimately a joint distribution over all variables. The direction of the arrows does not affect which values are possible in the joint table, though the absence of arrows may restrict the possible values for the joint table, e.g. if there are no arrows, the values in the joint PDF table will need to reflect the fact that all variables are independent.
+While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightarrow alarm$, the direction of the arrows does not change the space of possible distributions represented by the Bayes Net. That is, if you flip an arrow, it is possible to pick new values for the CPTs such that the joint distribution is unchanged. Or stated differently: Our model is ultimately a joint distribution over all variables. The direction of the arrows does not affect which values are possible in the joint table, though the absence of arrows may restrict the possible values for the joint table, e.g. if there are no arrows, the values in the joint PDF table will need to reflect the fact that all variables are independent.
 
 \section*{Inference}
 
@@ -114,6 +134,10 @@ $P(T)\sum_s{P(s|T)\sum_e{P(c|T)P(+e|c,s)}}$
 
 \section*{Sampling}
 
-hello
+An alternate approach for probabilistic reasoning
 
 \end{document}
+
+\textbf{Bayesian networks} (Bayes nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
+
+With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions. 
