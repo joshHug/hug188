@@ -10,7 +10,7 @@
 \documentclass[11pt,fleqn]{article}
 \usepackage{latexsym,epsf,amsmath,amsfonts,graphicx,url}
 
-\title{Note 6}
+\title{Note 6 (alpha)}
 
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -35,7 +35,7 @@ More precisely, our model is a \textbf{joint distribution}, i.e. a table of prob
 
 
 \begin{center}	
-	\includegraphics[width=10cm]{img/pdf_example}
+	\includegraphics[height=6cm]{img/pdf_example}
 \end{center}
 
 This model allows us to answer questions that might be of interest to us, for example:
@@ -44,21 +44,22 @@ This model allows us to answer questions that might be of interest to us, for ex
 \item What is the probability that it is sunny? $P(w = sunny)$
 \item What is the probability distribution for the weather, given that we know it is winter? $P(W | s = winter)$
 \item What is the probability that it is winter, given that we know it is rainy and cold? $P(s = winter | t = cold, w = rain)$
+\item What is the probability distribution for the weather and season give that we know that it is cold? $P(S, W | t = cold)$
 \end{itemize}
 
-Given a joint PDF, we can trivially perform compute any desired probablity $P(Q|e_1...e_k)$ using a simple intuitive procedure known as \textbf{Inference by Enumeration}. In this procedure, we collect all the rows consistent with the evidence available (i.e. $e_1...e_k$, sum out all the hidden variables (i.e. all variables for which we do not have evidence), and finally normalize the table so that it is a probability distribution.
+Given a joint PDF, we can trivially perform compute any desired probablity $P(Q_1...Q_k|e_1...e_k)$ using a simple intuitive procedure known as \textbf{Inference by Enumeration}. In this procedure, we collect all the rows consistent with the evidence available (i.e. $e_1...e_k$, sum out all the hidden variables (i.e. all variables for which we do not have evidence), and finally normalize the table so that it is a probability distribution (i.e. values sum to 1).
 
-For example, if we wanted to compute $P(W | s = winter)$, we'd select the four rows where s is winter, we'd sum out the 
+For example, if we wanted to compute $P(W | s = winter)$, we'd select the four rows where s is winter, then sum out the T variable, yielding the two row table where $P(w = sun | s = winter) = 0.5$ and $P(w = rain | s = winter) = 0.5$.
 
-
+So long as we have the joint PDF table, inference by enumeration (IBE) can be used to compute any desired probablity, even for multiple query variables $Q_1...Q_k$.
 
 \section*{Bayes Nets (Representation)}
 
-Naturally, representing an entire joint distribution in the memory of a computer is not very scalable - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! 
+While IBE can compute probabilities for any query we might desire, representing an entire joint distribution in the memory of a computer is impractical for real problems - if each of $n$ variable we wish to represent can take on $d$ possible values (it has a \textbf{domain} of size $d$), then our joint distribution table will have $d^n$ entries! 
 
 Bayes nets avoid this issue by taking advantage of the idea of conditional probability. Rather than storing information in a giant table, it is instead distributed across a large number of smaller local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. 
 
-Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. A node is conditionally independent of its ancestors given all of its parents. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
+Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. \textbf{A node is conditionally independent of all other nodes in the graph given all of its parents}. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
 
 As an example of a Bayes Net, consider a model where we have five binary random variables described below:
 
@@ -73,18 +74,16 @@ As an example of a Bayes Net, consider a model where we have five binary random 
 Assume the alarm can go off if either a burglary or an earthquake occurs, and that Mary and John will call if they hear the alarm. In this case, we can represent the natural conditional independences with the graph shown below.
 
 \begin{center}	
-	\includegraphics[width=10cm]{img/alarm_model}
+	\includegraphics[height=5cm]{img/alarm_model}
 \end{center}
 
-Models capture a way the world works - they are always a simplification - key
+Models capture a way the world works - they are always a simplification -
 all models are wrong, but some will still be useful for solving real problems in the real world. They may may not account for every variable or even every interaction between variables.
-
-\section*{Representation}
 
 More formally, we say that a Bayes Net consists of:
 \begin{itemize}
 \item A directed acyclic graph of nodes, one per variable X.
-\item A conditional distribution for each node $P(X | A_1 ... A_n)$, where $A_i$ is the ith parent of X, stored as a \textbf{conditional probability table} or CPT.
+\item A conditional distribution for each node $P(X | A_1 ... A_n)$, where $A_i$ is the ith parent of X, stored as a \textbf{conditional probability table} or CPT. Each CPT has $n+1$ rows.
 \end{itemize}
 
 Given all of the CPTs for a graph, we can calculate the probability of a given assignment using the chain rule: $P(x_1, x_2, ..., x_n) = \prod_{i=1}^n{x_i | parents(X_i)}$. 
@@ -95,9 +94,9 @@ This works because of the conditional indepences given by the graph. Specificall
 
 While it is most natural to assign arrows in a Bayes Net in the same direction as causality, e.g. $earthquake \rightarrow alarm$, the direction of the arrows does not change the space of possible distributions represented by the Bayes Net. That is, if you flip an arrow, it is possible to pick new values for the CPTs such that the joint distribution is unchanged. Or stated differently: Our model is ultimately a joint distribution over all variables. The direction of the arrows does not affect which values are possible in the joint table, though the absence of arrows may restrict the possible values for the joint table, e.g. if there are no arrows, the values in the joint PDF table will need to reflect the fact that all variables are independent.
 
-\section*{Inference}
+\section*{Bayes Nets (Inference)}
 
-Inference is the process of calculating the joint PDF for some set of query variables based on some set of observed variables. We can solve this problem naively by forming the joint PDF and using Inference by Enumeration. This requires creation and iteration over an exponentially large table.
+Inference is the process of calculating the joint PDF for some set of query variables based on some set of observed variables. We can solve this problem naively by forming the joint PDF and using Inference by Enumeration as described above. This requires creation and iteration over an exponentially large table.
 
 An alternate approach is to \textbf{eliminate} variables one by one. To eliminate a variable X, we: 
 
@@ -106,21 +105,24 @@ An alternate approach is to \textbf{eliminate} variables one by one. To eliminat
 \item Sum out X.
 \end{itemize}
 
-For example, suppose we have a model as shown below, where T, C, S, and E can take on binary values, as shown below:
+For example, suppose we have a model as shown below, where T, C, S, and E can take on binary values, as shown below. Here, T represents the chance that an adventurer takes a treasure, C represents the chance that a cage falls on the adventurer given that he takes the treasure, E represents the chance that snakes are released if an adventurer takes the treasure, and E represents the chance that the adventurer escapes given information about the status of the cage and snakes.
 
 \begin{center}	
-	\includegraphics[width=10cm]{img/TCSE_model.png}
+	\includegraphics[height=5cm]{img/TCSE_model.png}
 \end{center}
 
 In this case, we have the factors $P(T)$, $P(C|T)$, $P(S|T)$, and $P(E|C, S)$. Suppose we want to calculate $P(T | +e)$. The naive approach would be to form the 16 row joint PDF $P(T, C, S, E)$, select only the rows corresponding to +e, then summing out C and S and finally normalizing. 
 
-The alternate approach is to eliminate C, then S, one variable at a time.
+The alternate approach is to eliminate C, then S, one variable at a time. We'd proceed as follows:
 
-Suppose we eliminate C first. In this case, we'd join (multiply) all the factors involving C, namely $P(C|T)$ and $P(+e|C, S)$. The product rule tells us that this product equals $P(C, +e | T, S)$. We'd then sum out C, leaving us with a new factor $P(+e | T, S)$. 
+\begin{itemize}
+\item Join (multiply) all the factors involving C, forming $P(C, +e | T, S) = P(C|T) \cdot P(+e|C, S)$. 
+\item Sum out C form this new factor, leaving us with a new factor $P(+e | T, S)$. 
+\item Join all factors involving S, forming $P(+e, S | T) = P(S|T) \cdot P(+e | T,S)$.
+\item Sum out S, yielding $P(+e | T)$.
+\end{itemize}
 
-At this point, we now have three factors $P(T)$, $P(S|T)$, and our new factor $P(+e | T, S)$. To eliminate S, we'd join (multiply) $P(S|T)$ and $P(+e | T, S)$, yielding $P(+e, S | T)$. Summing over S we'd get $P(+e | T)$.
-
-With S and T eliminated, we are left with two factors: $P(T)$ and $P(+e | T)$. Recall that our goal is to calculate $P(T | +e)$. To calculate this, we multiply our two factors, yielding $P(+e, T)$. Finally, we normalize, yielding $P(T|+e)$.
+Once we have $P(+e|T)$, we can easily compute $P(T|+e)$. For a more thorough working out of the example, see lecture 15.
 
 While this process is more involved from a conceptual point of view, the maximum size of any factor generated is only 8 rows instead of 16 as it would be if we formed the entire joint PDF.
 
@@ -132,12 +134,69 @@ Variable elimination is equivalent to calculating $P(+e, T)$ as follows:
 
 $P(T)\sum_s{P(s|T)\sum_e{P(c|T)P(+e|c,s)}}$
 
-\section*{Sampling}
+\section*{Bayes Nets (Sampling)}
 
-An alternate approach for probabilistic reasoning
+An alternate approach for probabilistic reasoning is to implicitly calculate the probabilities for our query by simply counting samples.
+
+For example, suppose we wanted to calculate $P(T | +e)$. If we had a magic machine that could generate samples from our distribution, we could collect all samples for which the adventurer escapes the maze, and then compute the fraction of those escapes for which the adventurer also took the treasure. Put differently, if we could run simulations of say, million of adventurers, we'd easily be able to compute any inference we'd want.
+
+Given a Bayes Net model, we can easily write a simulator. For example, consider the CPTs given below for the simplified model with only two variables T and C.
+
+\begin{center}	
+	\includegraphics[height=5cm]{img/tc_model.png}
+\end{center}
+
+A simple simulator in Python would be as follows:
+
+\begin{verbatim}
+import random
+
+def get_t():
+	if random.random() < 0.99:
+		return True
+	return False
+
+def get_c(t):
+	if t and random.random() < 0.95:
+		return True
+	return False
+
+def get_sample():
+	t = get_t()
+	c = get_c(t)
+	return [t, c]
+\end{verbatim}
+
+We call this simple approach \textbf{prior sampling}. The downside of this approach is that it may require the generation of a very large number of samples in order to perform analysis of unlikely scenarios. If weanted to compute $P(C | -t)$, we'd have to throw away 99\% of our samples. 
+
+One way to mitigate this this problem, we can modify our procedure to early reject any sample inconsistent with our evidence. For example, for the query $P(C | -t)$, we'd avoid generating a value for C unless t is true. This still means we have to throw away most of our samples, but at least the bad samples we generate take less time to create. We call this approach \textbf{rejection sampling}.
+
+These two approaches work for the same reason, which is that any valid sample occurs with the same probability as specified in the joint PDF. In other words, the probability of every sample is based on the product of every CPT, or as I personally call it, the "every CPT participates principle".
+
+A more exotic approach is \textbf{likelihood weighting}, which ensures that we never generate a bad sample. In this approach, we manually set all variables equal to the evidence in our query. For example, if we wanted to compute $P(C | -t)$, we'd simply declare that t is false. The problem here, obviously, is that this may yield samples that are inconsistent with the correct distribution. As an example, consider the more complex four variable model for T, C, S, and E given earlier in these notes. If we wanted to compute $P(T, S, +c, +e)$, and simply picked values for T and S without taking into account the fact that c = false, and e = true, then there's no guarantee that our samples actually obey the joint PDF given by the Bayes Net. For example, if the cage only ever falls if the treasure is taken, then we'd want to ensure that T is always true instead of using the $P(T)$ distribution given in the Bayes Net. 
+
+Put differently, if we simply force some variables equal to the evidence, then our samples occur with probability given only equal to the products of the CPTs of the non-evidence variables. This means the joint PDF has no guarantee of being correct (though may be for some cases like our two variable Bayes Net). Instead, if we have sampled variables $z_1$ through $z_p$ and fixed evidence variables $e_1$ through $e_m$ a sample is given by the probability $P(z_1...z_p,e_1...e_m) = \prod_i^p{P(z_i)|Parents(z_i)}$. What is missing is that the probability of a sample does not include all the probabilities of $P(e_i)|Parents(e_i)$, i.e. not every CPT participates. 
+
+An interesting workaround is to reweight each sample by the probability of its evidence variables. That is, instead of counting all samples equally, we can weight samples with unlikely evidence by a number < 1.0 that captures the unlikeliness of some samples. In this way, we ensure that every CPT participates.
+
+For example, suppose we want to calculate $P(T | +c, +e)$. For the jth sample, we'd perform the following algorithm:
+
+\begin{itemize}
+\item Set $w_j$ to 1.0, and c = true and e = true.
+\item Generate $t_j$ from $P(T)$ since it is not an evidence variable.
+\item Multiply the weight of the sample by $P(t_j|+c)$, i.e. $w_j = w_j \cdot P(t_j|+c)$, since it is an evidence variable.
+\item Generate $s_j$ from $P(T)$ since it is not an evidence variable.
+\item The sample is done at this point, but we still multiply the weight by $P(+e | +c, s_j)$, i.e. $w_j = w_j \cdot P(+e | +c, s_j)$.
+\end{itemize}
+
+Then when we perform the usual counting process, we count each sample $w_j$ times instead of 1 time, where $0 <= w_j <= 1$. This approach works because in the final calculations for the probabilities, the weights effectively serve to replace the missing CPTs. In effect, we ensure that the weight sampling probability of each sample is given by $P(z_1...z_p,e_1...e_m) = \prod_i^p{P(z_i)|Parents(z_i)} P(e_i)|Parents(e_i)$. 
+
+For all three of our sampling methods, we can get increasing amounts of accuracy by generating additional samples. However, of the three, likelihood weighting is the most computationally efficient, for reasons beyond the scope of this course.
+
+Gibbs Sampling is a fourth approach for sampling. In this approach, we first set all variables to some totally random value (not taking into account any CPTs). We then repeatedly pick one variable at a time, clear its value, and resample given the other N-1 evidence variables.
+
+For the T, C, S, E example above, we might assign t = true, c = true, s = false, and e = true. We then pick one of our four variables randomly and clear it, say S. We then pick a new variable from the distribution $P(S | +t, +c, -s)$. This requires us knowing this distribution. It turns out that we can easily compute the distribution of any single variable given all other evidence variables. More specifically, $P(S | T, C, S)$ can be calculated only using the CPTs that involve S. Thus, in a typical Bayes Net, where most variables have only a constant number of connections, we can precompute these N distributions in linear time. 
+
+We will not prove this, but if we repeat this process enough times, our later samples will eventually converge to the correct distribution even though we start from an initially terrible starting point. If you're curious, there are some caveats beyond the scope of the course that you can read about under the Failure Modes section of the wikipedia aritcle for Gibbs Sampling.
 
 \end{document}
-
-\textbf{Bayesian networks} (Bayes nets for short), graphical models that capture the conditional independence relationships between variables we want to represent and when done correctly can allow us to make good predictive inferences about various questions we wish to answer. Let's get started by discussing how Bayes' nets are constructed. <DONT LIKE THIS MAKE IT BETTER>
-
-With this efficient storage, we can recompute any desired probabilities on demand by running \textbf{probabilistic inference} on the local probability distributions. 
