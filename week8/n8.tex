@@ -54,7 +54,7 @@ Since we know the probability distribution of the initial state $P(x_1)$ and tra
 A interesting phenomenon regarding $P(X_t)$ for a stationary MC is that as $t$ goes to infinity, $P(X_t)$ converges to a fixed probability distribution (you can think of it as a fixed probability table) whatever probability distribution the initial state has. To derive what distribution $P(X_t)$ converges to, we can use Mini-Forward algorithm,
 \begin{align}
 \label{eqn:stat_dist}
-P(x_{\infty+1}) &= \sum_{x_{\infty}}P(x_{\infty+1},x_{\infty})\nonumber\\
+P(x_{\infty})=P(x_{\infty+1}) &= \sum_{x_{\infty}}P(x_{\infty+1},x_{\infty})\nonumber\\
 &= \sum_{x_{\infty}} \underbrace{P(x_{\infty+1}|x_{\infty})}_{\text{transition probability}}P(x_{\infty})
 \end{align}
 In addition, we know that the probability should be summed up to one, i.e.,
@@ -68,7 +68,7 @@ Note that (\ref{eqn:stat_dist}) and (\ref{eqn:one}) provide a system of linear e
 \section{Hidden Markov Model}
 As aforementioned, in many real-world problems we cannot directly gather evidence on the exact state but some noisy observations related to the actual state. Say, in the robot localization problem, we can only observe a sequence of noisy range sensor readings and hope to infer the actual location of the robot based on the sensor measurements. In this problem, the actual robot location is the hidden state variable (something we would like to know but not observable), the sensor measurements are evidence/observation variables (something we can directly observe). The model for this kind of problem is hidden Markov model.
 
-Hidden Markov model (HMM) (Figure~\ref{fig:hmm}) consists of state variables $X_t$ that evolve according to Markov property and observable evidence variables $E_t$. An HMM is defined by initial state distribution $P(X_1)$, transition model $P(X_{t+1}|X_t)$ and emission model $P(E_t|X_t)$. 
+Hidden Markov model (HMM) (shown below) consists of state variables $X_t$ that evolve according to Markov property and observable evidence variables $E_t$. An HMM is defined by initial state distribution $P(X_1)$, transition model $P(X_{t+1}|X_t)$ and emission model $P(E_t|X_t)$. 
 
 \begin{center}	
 \label{fig:hmm}
@@ -122,7 +122,7 @@ Note that $m_2[x_2] = \max_{x_1} P(x_1,x_2,e_1,e_2) = \max_{x_1} P(e_2|x_2)P(e_1
 Note that the update in the Viterbi algorithm looks exactly the same as the forward algorithm except that the summation is changed to the max operator.
 
 \section{Particle Filtering}
-In this section we consider an algorithm that finds an approximate solution for the filtering task, i.e., $P(X_t|e_1,\cdots,e_t)$. This is in contrast to forward algorithm, which compute the exact value of $P(X_t|e_1,\cdots,e_t)$. Firstly, why do we even need approximate inference? We can find from the previous contents that in order to perform forward algorithm, we need a way to represent transition model, emission model as well as the belief state that is generated along the way. This can be can trivially if the state is discrete, since we can always use probability tables to represent those. However, when the state is continuous it becomes hard to represent transition and emission model and to keep track of belief states. In the case where the problem has a very large space, you may need excessive memory to store those probability tables. We would like an efficient method to perform filtering task irrespective of the size of state space or even a continuous state space. Particle filtering is an approximate solution to find the belief state $P(X_t|e_1,\cdots,e_t)$, which approximates the belief states by a set of samples/particles.
+In this section we consider an algorithm that finds an approximate solution for the filtering task, i.e., $P(X_t|e_1,\cdots,e_t)$. This is in contrast to forward algorithm, which compute the exact value of $P(X_t|e_1,\cdots,e_t)$. Firstly, why do we even need approximate inference? We can find from the previous contents that in order to perform forward algorithm, we need a way to represent transition model, emission model as well as the belief state that is generated along the way. This can be done trivially if the state is discrete, since we can always use probability tables to represent those. However, when the state is continuous it becomes hard to represent transition and emission model and to keep track of belief states. In the case where the problem has a very large space, you may need excessive memory to store those probability tables. We would like an efficient method to perform filtering task irrespective of the size of state space or even a continuous state space. Particle filtering is an approximate solution to find the belief state $P(X_t|e_1,\cdots,e_t)$, which approximates the belief states by a set of samples/particles.
 
 At time $t$, we start with a set of particles representing the old belief state $P(X_{t-1}|e_1,\cdots,e_{t-1})$. Then the particle filtering takes the following three steps to update the belief: 
 
