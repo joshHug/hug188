@@ -83,7 +83,7 @@ all models are wrong, but some will still be useful for solving real problems in
 More formally, we say that a Bayes Net consists of:
 \begin{itemize}
 \item A directed acyclic graph of nodes, one per variable X.
-\item A conditional distribution for each node $P(X | A_1 ... A_n)$, where $A_i$ is the ith parent of X, stored as a \textbf{conditional probability table} or CPT. Each CPT has $n+1$ rows.
+\item A conditional distribution for each node $P(X | A_1 ... A_n)$, where $A_i$ is the ith parent of X, stored as a \textbf{conditional probability table} or CPT. Each CPT has $n+1$ columns and $d^{n+1}$ rows.
 \end{itemize}
 
 Given all of the CPTs for a graph, we can calculate the probability of a given assignment using the chain rule: $P(x_1, x_2, ..., x_n) = \prod_{i=1}^n{x_i | parents(X_i)}$. 
