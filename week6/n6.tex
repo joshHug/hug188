@@ -59,7 +59,7 @@ While IBE can compute probabilities for any query we might desire, representing 
 
 Bayes nets avoid this issue by taking advantage of the idea of conditional probability. Rather than storing information in a giant table, it is instead distributed across a large number of smaller local probability tables along with a \textbf{directed acyclic graph} which captures the relationships between variables. 
 
-Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. \textbf{A node is conditionally independent of all other nodes in the graph given all of its parents}. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
+Specifically, each node in the graph represents a single random variable. Arrows in the graph represent conditional independent relationships. \textbf{A node is conditionally independent of all of its non-descendants in the graph given all of its parents}. Thus, if we have a node representing variable Q, we store $P(Q | X_1, X_2, ..., X_N)$, where $X_1, ..., X_N$ are the parents of Q.
 
 As an example of a Bayes Net, consider a model where we have five binary random variables described below:
 
